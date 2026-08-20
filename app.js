@@ -189,6 +189,7 @@ function escapeHtml(v) { const el = document.createElement('div'); el.textConten
 // ---------- Screen switching ----------
 function showView(view) {
   [uploadView, step1View, step2View].forEach(v => v.classList.toggle('hidden', v !== view));
+  document.querySelectorAll('.nav-item').forEach(item => item.classList.toggle('active', item.dataset.view === view.id));
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
