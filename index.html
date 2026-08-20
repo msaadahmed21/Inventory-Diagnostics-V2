@@ -9,19 +9,42 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   </head>
   <body>
+    <!-- Persistent top bar: stays visible across all three screens. -->
+    <header class="site-header">
+      <div class="site-header-inner">
+        <span class="brand"><span class="brand-mark"></span>Inventory Diagnostic</span>
+        <span class="header-badge">V2 · Data-Driven Assessment</span>
+      </div>
+    </header>
+
     <main class="page">
       <!-- Upload screen: file picker + sample data. Shown until a file is chosen. -->
       <section id="upload" class="hero">
-        <p class="eyebrow">V2 • DATA-DRIVEN ASSESSMENT</p>
-        <h1>Inventory Diagnostic</h1>
-        <p class="intro">Upload a simple inventory file to see the first five diagnostic KPIs.</p>
+        <div class="hero-band">
+          <div class="hero-inner">
+            <p class="eyebrow">DATA-DRIVEN INVENTORY ASSESSMENT</p>
+            <h1>Find the cash trapped in <span class="accent">your inventory.</span></h1>
+            <p class="intro">Upload a CSV or Excel export and get five diagnostic KPIs in seconds. Everything runs securely in your browser - nothing is uploaded to a server.</p>
 
-        <label class="upload" for="file-input">
-          <span>Choose an Excel or CSV file</span>
-          <small>.xlsx, .xls, or .csv</small>
-        </label>
-        <input id="file-input" type="file" accept=".xlsx,.xls,.csv" />
-        <p id="status" class="status" aria-live="polite">Use the sample file below to try it immediately.</p>
+            <div class="hero-actions">
+              <label class="upload" for="file-input">
+                <svg class="upload-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                <span class="upload-text">
+                  <span>Choose an Excel or CSV file</span>
+                  <small>.xlsx, .xls, or .csv</small>
+                </span>
+              </label>
+              <input id="file-input" type="file" accept=".xlsx,.xls,.csv" />
+            </div>
+            <p id="status" class="status" aria-live="polite">Use the sample file below to try it immediately.</p>
+
+            <ul class="trust-row">
+              <li>No sign-up required</li>
+              <li>Runs securely in your browser</li>
+              <li>Nothing leaves your device</li>
+            </ul>
+          </div>
+        </div>
 
         <section class="sample">
           <h2>Try it with sample data</h2>

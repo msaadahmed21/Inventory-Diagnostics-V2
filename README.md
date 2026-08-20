@@ -1,14 +1,25 @@
-# Inventory Diagnostic (v2)
+# Inventory Diagnostic
 
-A static, client-side inventory diagnostic tool. Upload a CSV/Excel export and
-see 5 headline KPIs: total inventory, inventory turns, days inventory,
-inventory/demand ratio, and potential excess inventory.
+This repo now ships **two versions** of the same tool, for two different
+purposes:
 
-No build step, no backend - just open `index.html` (or serve the folder
-statically) and it runs entirely in the browser using
-[SheetJS](https://sheetjs.com/) to parse the uploaded file.
+1. **The live web app** (`index.html`, `app.js`, `style.css`) - a
+   static, client-side app you open in a browser. This is what's
+   published at the project's GitHub Pages link. No build step, no
+   backend - it runs entirely in the browser using
+   [SheetJS](https://sheetjs.com/) to parse the uploaded file.
+2. **A Python command-line version** (`inventory_diagnostic.py`) - the
+   same logic and flow, rewritten as a heavily-commented terminal
+   program, aimed at someone revising core Python concepts (functions,
+   dictionaries, lists, loops, `try`/`except`). It runs in a terminal,
+   not a browser, and isn't part of the hosted web app (GitHub Pages
+   can only serve static HTML/CSS/JS, not run Python).
 
-## Flow
+Both give you the same 5 headline KPIs from an inventory file: total
+inventory, inventory turns, days inventory, inventory/demand ratio, and
+potential excess inventory.
+
+## Web app: flow
 
 1. **Upload** - pick a CSV/Excel file, or try the included `sample-inventory.csv`.
 2. **Step 1: data quality review** - always shown before the dashboard. Explains
@@ -20,15 +31,49 @@ statically) and it runs entirely in the browser using
    couldn't be fully computed is shown as `—` with a short reason instead of a
    silently wrong number.
 
-## Files
+### Web app files
 
 - `index.html` - page structure (upload screen, Step 1, Step 2)
 - `app.js` - all logic: file parsing, the data-quality checks, and rendering
 - `style.css` - styling
-- `sample-inventory.csv` - example file matching the expected columns
 
-## What's new in v2
+## Python version: how to run it
 
-- The upload → data-quality-review → dashboard flow is now always two explicit
-  steps, instead of conditionally skipping straight to the dashboard.
-- `app.js` and the former `data-quality.js` are combined into one file.
+No installation needed beyond Python itself - it only uses Python's
+built-in standard library (`csv`, `sys`, `re`, `statistics`).
+
+```
+python inventory_diagnostic.py
+```
+
+or point it straight at a file:
+
+```
+python inventory_diagnostic.py sample-inventory.csv
+```
+
+If you don't pass a file, it will ask for a path and default to
+`sample-inventory.csv` if you just press Enter. It follows the same
+Step 1 (data quality) → Step 2 (dashboard) flow as the web app, printed
+to the terminal instead of rendered as a web page.
+
+Note: the Python version's file parser is intentionally simpler than
+the web app's - it reads a single flat CSV file (like
+`sample-inventory.csv`), and doesn't include the web app's very
+specific "SAP inventory network" multi-sheet Excel importer.
+
+## Shared files
+
+- `sample-inventory.csv` - example file matching the expected columns,
+  usable by both versions.
+
+## Expected columns
+
+Both versions look for these columns (a few alternate spellings are
+accepted for each):
+
+| SKU | Inventory € | Annual Demand € | Lead Time days | Safety Stock € |
+|-----|-------------|------------------|-----------------|-----------------|
+| A001 | 120000 | 600000 | 30 | 40000 |
+| A002 | 80000 | 320000 | 45 | 30000 |
+| A003 | 250000 | 500000 | 60 | 120000 |
