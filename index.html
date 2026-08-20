@@ -9,111 +9,108 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   </head>
   <body>
-    <!-- Persistent top bar: stays visible across all three screens. -->
-    <header class="site-header">
-      <div class="site-header-inner">
-        <span class="brand"><span class="brand-mark"></span>Inventory Diagnostic</span>
-        <span class="header-badge">V2 · Data-Driven Assessment</span>
-      </div>
-    </header>
+    <div class="app">
+      <!-- Sidebar: persistent brand block + 3-step progress nav (highlighted by app.js as the view changes). -->
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="tag">V2 · Data-Driven Assessment</div>
+          <h1>Inventory Diagnostic</h1>
+          <div class="sub">Five headline KPIs from a single inventory file</div>
+        </div>
+        <nav>
+          <div class="nav-item" data-view="upload"><span class="n">1</span> Upload file</div>
+          <div class="nav-item" data-view="step1"><span class="n">2</span> Data quality review</div>
+          <div class="nav-item" data-view="step2"><span class="n">3</span> Dashboard</div>
+        </nav>
+        <div class="nav-foot"><b>Private by design:</b> no sign-up, and nothing you upload leaves your browser.</div>
+      </aside>
 
-    <main class="page">
-      <!-- Upload screen: file picker + sample data. Shown until a file is chosen. -->
-      <section id="upload" class="hero">
-        <div class="hero-band">
-          <div class="hero-inner">
-            <p class="eyebrow">DATA-DRIVEN INVENTORY ASSESSMENT</p>
-            <h1>Find the cash trapped in <span class="accent">your inventory.</span></h1>
-            <p class="intro">Upload a CSV or Excel export and get five diagnostic KPIs in seconds. Everything runs securely in your browser - nothing is uploaded to a server.</p>
+      <main>
+        <div class="page">
+          <!-- Upload screen: file picker + sample data. Shown until a file is chosen. -->
+          <section id="upload">
+            <div class="crumb">Inventory Diagnostic / Upload</div>
+            <h2 class="action-title">Upload your inventory file to see where cash is trapped in stock</h2>
+            <p class="action-sub">A CSV or Excel export with SKU, inventory value, annual demand, lead time and safety stock. Parsed entirely client-side - nothing is sent to a server.</p>
 
-            <div class="hero-actions">
-              <label class="upload" for="file-input">
-                <svg class="upload-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
-                <span class="upload-text">
-                  <span>Choose an Excel or CSV file</span>
-                  <small>.xlsx, .xls, or .csv</small>
-                </span>
+            <div class="card" style="margin-bottom:16px;">
+              <label class="btn primary uploadbtn" for="file-input">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                Choose an Excel or CSV file
               </label>
+              <span class="upload-hint">.xlsx, .xls, or .csv</span>
               <input id="file-input" type="file" accept=".xlsx,.xls,.csv" />
+              <p id="status" class="status" aria-live="polite">Use the sample file below to try it immediately.</p>
             </div>
-            <p id="status" class="status" aria-live="polite">Use the sample file below to try it immediately.</p>
 
-            <ul class="trust-row">
-              <li>No sign-up required</li>
-              <li>Runs securely in your browser</li>
-              <li>Nothing leaves your device</li>
-            </ul>
-          </div>
-        </div>
-
-        <section class="sample">
-          <h2>Try it with sample data</h2>
-          <p>Create a spreadsheet with these exact column headings (or download the sample CSV):</p>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>SKU</th><th>Inventory €</th><th>Annual Demand €</th><th>Lead Time days</th><th>Safety Stock €</th></tr></thead>
-              <tbody>
-                <tr><td>A001</td><td>120000</td><td>600000</td><td>30</td><td>40000</td></tr>
-                <tr><td>A002</td><td>80000</td><td>320000</td><td>45</td><td>30000</td></tr>
-                <tr><td>A003</td><td>250000</td><td>500000</td><td>60</td><td>120000</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <a class="download" href="sample-inventory.csv" download>Download sample CSV</a>
-        </section>
-      </section>
-
-      <!-- Step 1: data quality review. Always shown after a file is parsed, before the dashboard. -->
-      <section id="step1" class="hidden quality-gate" aria-live="polite">
-        <p class="eyebrow">STEP 1 OF 2 • DATA QUALITY REVIEW</p>
-        <h2>Let's check your data</h2>
-        <div id="step1-summary"></div>
-        <div id="step1-details"></div>
-        <div class="gate-actions">
-          <button class="secondary upload-different">Upload a different file</button>
-          <button id="step1-continue" class="upload-button">Continue to dashboard</button>
-        </div>
-      </section>
-
-      <!-- Step 2: dashboard. Shown after the user continues from Step 1. -->
-      <section id="step2" class="hidden" aria-live="polite">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">STEP 2 OF 2 • RESULTS</p>
-            <h2>Inventory health at a glance</h2>
-          </div>
-          <button class="secondary upload-different">Upload another file</button>
-        </div>
-
-        <!-- The 5 headline KPIs; text content is filled in by renderStep2() in app.js.
-             The <small> notes explain when a KPI is blocked or only partially computed. -->
-        <div class="kpi-grid">
-          <article class="kpi"><p>Total inventory</p><strong id="total-inventory">—</strong><small id="total-inventory-note" class="kpi-note"></small></article>
-          <article class="kpi"><p>Inventory turns</p><strong id="inventory-turns">—</strong><small id="inventory-turns-note" class="kpi-note"></small></article>
-          <article class="kpi"><p>Days inventory</p><strong id="days-inventory">—</strong><small id="days-inventory-note" class="kpi-note"></small></article>
-          <article class="kpi"><p>Inventory / demand</p><strong id="inventory-ratio">—</strong><small id="inventory-ratio-note" class="kpi-note"></small></article>
-          <article class="kpi opportunity"><p>Potential excess inventory</p><strong id="potential-excess">—</strong><small id="potential-excess-note" class="kpi-note"></small></article>
-        </div>
-
-        <div class="content-grid">
-          <section class="panel">
-            <h2>Inventory by SKU</h2>
-            <div id="inventory-chart" class="chart"></div>
+            <section class="card sample">
+              <h3>Try it with sample data</h3>
+              <p>Create a spreadsheet with these exact column headings (or download the sample CSV):</p>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>SKU</th><th>Inventory €</th><th>Annual Demand €</th><th>Lead Time days</th><th>Safety Stock €</th></tr></thead>
+                  <tbody>
+                    <tr><td>A001</td><td>120000</td><td>600000</td><td>30</td><td>40000</td></tr>
+                    <tr><td>A002</td><td>80000</td><td>320000</td><td>45</td><td>30000</td></tr>
+                    <tr><td>A003</td><td>250000</td><td>500000</td><td>60</td><td>120000</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <a class="btn ghost download" href="sample-inventory.csv" download>Download sample CSV</a>
+            </section>
           </section>
-          <section class="panel">
-            <h2>Top opportunities</h2>
-            <p class="hint">Items with the highest estimated excess inventory.</p>
-            <div class="table-wrap">
-              <table>
-                <thead><tr><th>SKU</th><th>Inventory</th><th>Potential excess</th></tr></thead>
-                <tbody id="opportunities-table"></tbody>
-              </table>
+
+          <!-- Step 1: data quality review. Always shown after a file is parsed, before the dashboard. -->
+          <section id="step1" class="hidden quality-gate" aria-live="polite">
+            <div class="crumb">Inventory Diagnostic / Data Quality Review</div>
+            <h2 class="action-title">Let's check your data before showing the dashboard</h2>
+            <div id="step1-summary"></div>
+            <div id="step1-details" class="card"></div>
+            <div class="btn-row gate-actions">
+              <span class="btn ghost secondary upload-different">Upload a different file</span>
+              <button id="step1-continue" class="btn primary upload-button">Continue to dashboard</button>
             </div>
           </section>
+
+          <!-- Step 2: dashboard. Shown after the user continues from Step 1. -->
+          <section id="step2" class="hidden" aria-live="polite">
+            <div class="crumb">Inventory Diagnostic / Results</div>
+            <div class="section-heading">
+              <h2 class="action-title">Inventory health at a glance</h2>
+              <span class="btn ghost secondary upload-different">Upload another file</span>
+            </div>
+
+            <!-- The 5 headline KPIs; text content is filled in by renderStep2() in app.js.
+                 The <small> notes explain when a KPI is blocked or only partially computed. -->
+            <div class="grid g5 kpi-grid">
+              <article class="card kpi"><p>Total inventory</p><strong id="total-inventory">—</strong><small id="total-inventory-note" class="kpi-note"></small></article>
+              <article class="card kpi"><p>Inventory turns</p><strong id="inventory-turns">—</strong><small id="inventory-turns-note" class="kpi-note"></small></article>
+              <article class="card kpi"><p>Days inventory</p><strong id="days-inventory">—</strong><small id="days-inventory-note" class="kpi-note"></small></article>
+              <article class="card kpi"><p>Inventory / demand</p><strong id="inventory-ratio">—</strong><small id="inventory-ratio-note" class="kpi-note"></small></article>
+              <article class="card kpi opportunity"><p>Potential excess inventory</p><strong id="potential-excess">—</strong><small id="potential-excess-note" class="kpi-note"></small></article>
+            </div>
+
+            <div class="grid g2 content-grid">
+              <section class="card panel">
+                <h3>Inventory by SKU</h3>
+                <div id="inventory-chart" class="chart"></div>
+              </section>
+              <section class="card panel">
+                <h3>Top opportunities</h3>
+                <p class="hint">Items with the highest estimated excess inventory.</p>
+                <div class="table-wrap">
+                  <table>
+                    <thead><tr><th>SKU</th><th>Inventory</th><th>Potential excess</th></tr></thead>
+                    <tbody id="opportunities-table"></tbody>
+                  </table>
+                </div>
+              </section>
+            </div>
+            <footer class="page-foot">Potential excess is a simple first estimate: inventory above expected lead-time demand plus safety stock. We will refine this logic later.</footer>
+          </section>
         </div>
-        <p class="note">Potential excess is a simple first estimate: inventory above expected lead-time demand plus safety stock. We will refine this logic later.</p>
-      </section>
-    </main>
+      </main>
+    </div>
     <script src="app.js"></script>
   </body>
 </html>
