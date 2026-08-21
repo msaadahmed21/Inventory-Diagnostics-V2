@@ -1,8 +1,9 @@
 // Inventory Diagnostic v2 - all app logic in one file.
-// Flow: pick a file -> Step 1 (data quality review, always shown) -> Step 2 (dashboard).
+// Flow: Step 1 Data Foundation (pick a file, in the Sources & Ingestion tab) ->
+// Step 2 (data quality review, always shown) -> Step 3 (dashboard).
 
 // ---------- DOM references ----------
-const uploadView = document.querySelector('#upload');
+const foundationView = document.querySelector('#foundation');
 const step1View = document.querySelector('#step1');
 const step2View = document.querySelector('#step2');
 const fileInput = document.querySelector('#file-input');
@@ -188,15 +189,26 @@ function escapeHtml(v) { const el = document.createElement('div'); el.textConten
 
 // ---------- Screen switching ----------
 function showView(view) {
-  [uploadView, step1View, step2View].forEach(v => v.classList.toggle('hidden', v !== view));
+  [foundationView, step1View, step2View].forEach(v => v.classList.toggle('hidden', v !== view));
   document.querySelectorAll('.nav-item').forEach(item => item.classList.toggle('active', item.dataset.view === view.id));
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function resetToUpload() {
+// ---------- Data Foundation: 6-tab sub-navigation within Step 1 ----------
+// Independent of showView() above - this switches between the 6 tabs *inside*
+// #foundation, rather than between the 3 main steps.
+function activateSubTab(tabId) {
+  document.querySelectorAll('#foundation .tabbtn').forEach(btn => btn.classList.toggle('on', btn.dataset.tab === tabId));
+  document.querySelectorAll('#foundation .fd-panel').forEach(panel => panel.classList.toggle('active', panel.id === tabId));
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+document.querySelectorAll('#foundation .tabbtn').forEach(btn => btn.addEventListener('click', () => activateSubTab(btn.dataset.tab)));
+
+function resetToFoundation() {
   fileInput.value = ''; pending = null;
   status.textContent = 'Choose another file to run the diagnostic.';
-  showView(uploadView);
+  activateSubTab('fd-sources');
+  showView(foundationView);
 }
 
 // ---------- Step 1: data quality review ----------
@@ -293,4 +305,4 @@ fileInput.addEventListener('change', event => {
 });
 
 document.querySelector('#step1-continue').addEventListener('click', () => { if (pending) renderStep2(); });
-document.querySelectorAll('.upload-different').forEach(button => button.addEventListener('click', resetToUpload));
+document.querySelectorAll('.upload-different').forEach(button => button.addEventListener('click', resetToFoundation));

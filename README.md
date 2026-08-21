@@ -21,20 +21,30 @@ potential excess inventory.
 
 ## Web app: flow
 
-1. **Upload** - pick a CSV/Excel file, or try the included `sample-inventory.csv`.
-2. **Step 1: data quality review** - always shown before the dashboard. Explains
+1. **Step 1: Data Foundation** - where data comes in. Six tabs: Overview,
+   Sources & Ingestion, Data Quality Cockpit, Unstructured Capture, Golden
+   Record Workbench, and Governance & Lineage - previewing the roadmap for
+   pulling data from every source a team actually works with (ERP, Excel,
+   email, PPT decks, meeting transcripts). **Only the "Sources & Ingestion"
+   tab is live today** - it's where you pick a CSV/Excel file, or try the
+   included `sample-inventory.csv`. The other five tabs show illustrative,
+   synthetic data as a preview of what this becomes once connected to real
+   auto-extraction sources - clearly marked with a wireframe banner, not
+   live functionality yet.
+2. **Step 2: data quality review** - always shown before the dashboard. Explains
    what's missing from the file (a whole column, or just some rows) and exactly
    which KPIs that blocks or degrades, plus any other things worth checking
    (duplicate SKUs, suspicious values). If the file is clean, this just says so.
-3. **Step 2: dashboard** - the 5 KPIs, a bar chart of inventory by SKU, and a
+3. **Step 3: dashboard** - the 5 KPIs, a bar chart of inventory by SKU, and a
    table of the top opportunities by estimated excess inventory. Any KPI that
    couldn't be fully computed is shown as `—` with a short reason instead of a
    silently wrong number.
 
 ### Web app files
 
-- `index.html` - page structure (upload screen, Step 1, Step 2)
-- `app.js` - all logic: file parsing, the data-quality checks, and rendering
+- `index.html` - page structure (Data Foundation / Step 1, Step 2, Step 3)
+- `app.js` - all logic: file parsing, the data-quality checks, rendering, and
+  the Data Foundation tab-switching
 - `style.css` - styling
 
 ## Python version: how to run it

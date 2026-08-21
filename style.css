@@ -1,4 +1,4 @@
-/* Color palette + global resets - matched to the "Supply Chain Data Foundation" wireframe */
+/* Color palette + global resets */
 :root {
   --navy:#16283f; --navy-2:#1f3a5f; --navy-3:#2a4a72;
   --ink:#0b0b0b; --ink-2:#52514e; --muted:#898781;
@@ -9,8 +9,14 @@
   --accent:#c9a34e;
 }
 * { box-sizing:border-box; }
+/* The hover-tooltips below (.term::after) are wide, absolutely-positioned boxes that stay
+   invisible (visibility:hidden) until hovered - but even hidden, they still occupy layout
+   space and can push the page's scrollable width wider than the viewport on narrow screens.
+   Clipping horizontal overflow at the root prevents that phantom scroll without affecting
+   normal vertical scrolling. */
+html, body { overflow-x:hidden; }
 body { margin:0; font-family:system-ui, -apple-system, "Segoe UI", sans-serif; background:var(--page); color:var(--ink); }
-.hidden { display:none; } /* toggled by app.js to switch between the 3 screens */
+.hidden { display:none; } /* toggled by app.js to switch between the 3 main steps */
 .app { display:flex; min-height:100vh; }
 
 /* Sidebar */
@@ -34,23 +40,31 @@ main { flex:1; min-width:0; }
 h1,h2,h3,p { margin-top:0; }
 .action-title { font-size:21px; font-weight:700; line-height:1.35; margin:0 0 4px; max-width:820px; color:var(--ink); }
 .action-sub { font-size:13px; color:var(--ink-2); margin:0 0 22px; max-width:760px; }
+/* Data Foundation's ported headlines run longer than the rest of the app's - give them a bit more room */
+#foundation .action-title { max-width:920px; }
+#foundation .action-sub { max-width:820px; }
 
 .grid { display:grid; gap:16px; }
 .g5 { grid-template-columns:repeat(5,1fr); }
+.g4 { grid-template-columns:repeat(4,1fr); }
+.g3 { grid-template-columns:repeat(3,1fr); }
 .g2 { grid-template-columns:1.1fr .9fr; }
+/* Data Foundation's two-column cards want a wider left column than the dashboard's chart+table row */
+@media (min-width:851px) { #foundation .g2 { grid-template-columns:1.3fr 1fr; } }
 
 .card { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:16px 18px; }
 .card h3 { font-size:12.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-2); margin:0 0 12px; font-weight:700; }
 
-/* Buttons: .primary = filled navy, .ghost = outlined */
+/* Buttons: .primary = filled navy, .ghost = outlined, .btn-sm = compact variant for dense inline row-actions */
 .btn { display:inline-flex; align-items:center; gap:8px; font-size:12px; font-weight:600; padding:9px 16px; border-radius:6px; border:1px solid var(--border); background:#fff; color:var(--ink); cursor:pointer; text-decoration:none; transition:transform .1s ease, box-shadow .1s ease; }
 .btn.primary { background:var(--navy); color:#fff; border-color:var(--navy); }
 .btn.primary:hover { transform:translateY(-1px); box-shadow:0 6px 14px -4px rgba(22,40,63,.45); }
 .btn.ghost { background:transparent; }
 .btn.ghost:hover { background:#fff; }
+.btn-sm { font-size:11.5px; padding:6px 12px; }
 .btn-row { display:flex; gap:10px; flex-wrap:wrap; }
 
-/* Upload screen */
+/* Upload */
 input { display:none; } /* the real file input is hidden; the styled "Choose a file" label triggers it */
 .uploadbtn { padding:11px 20px; font-size:12.5px; }
 .upload-hint { display:inline-block; margin-left:10px; font-size:11.5px; color:var(--muted); }
@@ -58,7 +72,80 @@ input { display:none; } /* the real file input is hidden; the styled "Choose a f
 .sample p { color:var(--ink-2); font-size:13px; }
 .download { margin-top:4px; }
 
-/* Step 1: data quality review */
+/* Data Foundation: illustrative-data disclaimer + the 6-tab strip */
+.topbanner { background:#fff7e0; border:1px solid #eddfa8; border-radius:6px; color:#6b5610; font-size:11.5px; padding:8px 14px; letter-spacing:.02em; margin-bottom:18px; }
+.tabbtn { padding:6px 12px; font-size:11.5px; font-weight:600; border-radius:6px; color:var(--ink-2); background:#fff; border:1px solid var(--border); cursor:pointer; }
+.tabbtn.on { background:var(--navy); color:#fff; border-color:var(--navy); }
+.fd-panel { display:none; }
+.fd-panel.active { display:block; }
+
+/* Data Foundation: KPI tiles (Overview tab) - a different card pattern from the dashboard's .kpi p/.kpi strong */
+.kpi .val { font-size:26px; font-weight:700; }
+.kpi .lbl { font-size:11.5px; color:var(--muted); margin-top:2px; }
+.kpi .delta { font-size:11px; font-weight:600; margin-top:6px; }
+.delta.good { color:var(--good); }
+.delta.bad { color:var(--critical); }
+
+/* Data Foundation: status tags, pipeline flow diagram, quality heatmap legend */
+.tag { display:inline-flex; align-items:center; gap:5px; font-size:10.5px; font-weight:700; padding:3px 8px; border-radius:20px; }
+.tag.dot::before { content:""; width:6px; height:6px; border-radius:50%; background:currentColor; }
+.tag-good { background:#e9f8e9; color:#0a7d0a; }
+.tag-warn { background:#fff3dc; color:#8a5a00; }
+.tag-crit { background:#fbe6e6; color:#a92a2a; }
+.tag-neutral { background:#eef0f2; color:#52514e; }
+.tag-info { background:var(--blue-100); color:#154a8c; }
+
+.flow { display:flex; align-items:stretch; gap:0; margin:6px 0 4px; }
+.flow .step { flex:1; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:14px 16px; position:relative; }
+.flow .step h4 { margin:0 0 4px; font-size:12.5px; }
+.flow .step p { margin:0; font-size:11px; color:var(--ink-2); line-height:1.45; }
+.flow .arrow { width:26px; display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:16px; flex-shrink:0; }
+.flow .step .stage-lbl { font-size:9.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--accent); font-weight:700; margin-bottom:6px; display:block; }
+
+.heat-table td.score { text-align:center; font-weight:700; color:#fff; font-size:12px; border-radius:4px; }
+.legend { display:flex; gap:14px; font-size:11px; color:var(--ink-2); margin-top:10px; align-items:center; flex-wrap:wrap; }
+.legend .sw { width:11px; height:11px; border-radius:3px; display:inline-block; margin-right:5px; vertical-align:-1px; }
+
+.src-icon { width:26px; height:26px; border-radius:6px; background:var(--blue-100); color:#154a8c; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; }
+
+.quote { border-left:3px solid var(--accent); padding:8px 12px; background:#fbf7ec; font-size:11.5px; color:var(--ink-2); font-style:italic; margin:6px 0; line-height:1.5; }
+
+.conf-bar { height:6px; border-radius:3px; background:var(--gridline); overflow:hidden; width:70px; display:inline-block; vertical-align:middle; }
+.conf-fill { height:100%; background:var(--blue-500); }
+
+.split { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin:10px 0; }
+.split .box { border:1px solid var(--border); border-radius:6px; padding:10px 12px; font-size:12px; }
+.split .box .src { font-size:10px; text-transform:uppercase; color:var(--muted); font-weight:700; letter-spacing:.03em; margin-bottom:4px; }
+.split .box.winner { border-color:var(--good); background:#f2fbf2; }
+.split .box .val { font-size:14px; font-weight:700; margin:2px 0; }
+
+.raci-cell { text-align:center; font-weight:700; font-size:11px; }
+.raci-cell.r { color:#154a8c; }
+.raci-cell.a { color:#8a5a00; }
+.raci-cell.c { color:#52514e; }
+.raci-cell.i { color:var(--muted); }
+
+.lineage { display:flex; align-items:center; gap:0; flex-wrap:wrap; font-size:11px; }
+.lineage .node { background:#fff; border:1px solid var(--border); border-radius:6px; padding:8px 10px; min-width:110px; text-align:center; }
+.lineage .node.gold { border-color:var(--accent); background:#fdf9ef; font-weight:700; }
+.lineage .connector { width:22px; text-align:center; color:var(--muted); }
+
+/* Hover-tooltip definitions for jargon terms (DQ, Golden Record, RACI, etc.) - CSS-only, no JS */
+.term { border-bottom:1.5px dotted var(--accent); cursor:help; position:relative; }
+.term::after {
+  content:attr(data-tip);
+  position:absolute; left:0; bottom:calc(100% + 8px);
+  width:240px; max-width:60vw;
+  background:var(--navy); color:#fff; font-weight:400; font-size:11px; line-height:1.5;
+  padding:8px 10px; border-radius:6px;
+  box-shadow:0 8px 20px -6px rgba(11,11,11,.35);
+  opacity:0; visibility:hidden; transform:translateY(4px);
+  transition:opacity .12s ease, transform .12s ease;
+  z-index:20; pointer-events:none;
+}
+.term:hover::after, .term:focus::after { opacity:1; visibility:visible; transform:translateY(0); }
+
+/* Step 2: data quality review */
 .quality-gate #step1-summary .intro { font-size:13px; color:var(--ink-2); margin-bottom:16px; }
 .gate-section { margin-top:0; padding-top:16px; border-top:1px solid var(--gridline); }
 .gate-section:first-child { margin-top:0; padding-top:0; border-top:none; }
@@ -66,7 +153,7 @@ input { display:none; } /* the real file input is hidden; the styled "Choose a f
 .gate-section ul { margin:0; padding-left:18px; font-size:13px; color:var(--ink); line-height:1.65; }
 .gate-actions { margin-top:22px; }
 
-/* Step 2: dashboard */
+/* Step 3: dashboard */
 #step2 { margin-top:4px; }
 .section-heading { display:flex; align-items:end; justify-content:space-between; gap:16px; margin-bottom:18px; }
 .section-heading .action-title { margin-bottom:0; }
@@ -91,15 +178,19 @@ input { display:none; } /* the real file input is hidden; the styled "Choose a f
 .bar-value { text-align:right; color:var(--ink-2); font-weight:600; }
 
 .table-wrap { overflow-x:auto; }
+.table-wrap td { white-space:nowrap; } /* the app's own tables (short SKUs/currency values) stay on one line; Data Foundation's longer-text tables wrap normally */
 table { width:100%; border-collapse:collapse; font-size:12.5px; }
 th { text-align:left; font-size:10.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); font-weight:700; padding:7px 10px; border-bottom:1px solid var(--gridline); }
-td { padding:9px 10px; border-bottom:1px solid var(--gridline); vertical-align:middle; white-space:nowrap; }
+td { padding:9px 10px; border-bottom:1px solid var(--gridline); vertical-align:middle; }
 tr:last-child td { border-bottom:none; }
 
-/* Responsive: sidebar collapses to a top strip, KPI grid reflows */
+/* Responsive: sidebar collapses to a top strip, grids reflow */
 @media (max-width:850px) {
   .g5 { grid-template-columns:repeat(2,1fr); }
+  .g4 { grid-template-columns:repeat(2,1fr); }
+  .g3 { grid-template-columns:repeat(2,1fr); }
   .g2 { grid-template-columns:1fr; }
+  .split { grid-template-columns:1fr; }
 }
 @media (max-width:760px) {
   .app { flex-direction:column; }
@@ -112,5 +203,10 @@ tr:last-child td { border-bottom:none; }
 @media (max-width:480px) {
   .page { padding:20px 16px 40px; }
   .g5 { grid-template-columns:1fr; }
+  .g4, .g3 { grid-template-columns:1fr; }
   .section-heading { align-items:start; flex-direction:column; }
+  .flow { flex-direction:column; }
+  .flow .arrow { transform:rotate(90deg); padding:2px 0; }
+  .lineage { flex-direction:column; align-items:stretch; }
+  .lineage .connector { transform:rotate(90deg); padding:4px 0; }
 }
